@@ -20,10 +20,11 @@ defmodule FlowWeb.Router do
     get "/", PageController, :home
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", FlowWeb do
-  #   pipe_through :api
-  # end
+  scope "/api", FlowWeb do
+    pipe_through :api
+
+    post "/telemetry", TelemetryController, :create
+  end
 
   # Enable LiveDashboard in development
   if Application.compile_env(:flow, :dev_routes) do

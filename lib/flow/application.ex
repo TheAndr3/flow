@@ -12,6 +12,7 @@ defmodule Flow.Application do
       Flow.Repo,
       {DNSCluster, query: Application.get_env(:flow, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Flow.PubSub},
+      Flow.Telemetry.Pipeline,
       # Start a worker by calling: Flow.Worker.start_link(arg)
       # {Flow.Worker, arg},
       # Start to serve requests, typically the last entry
