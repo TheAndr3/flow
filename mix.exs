@@ -51,6 +51,7 @@ defmodule Flow.MixProject do
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:broadway, "~> 1.0"},
       {:oban, "~> 2.17"},
+      {:req, "~> 0.5"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.3", runtime: Mix.env() == :dev},
