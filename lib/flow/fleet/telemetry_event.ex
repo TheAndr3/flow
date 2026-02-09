@@ -20,8 +20,23 @@ defmodule Flow.Fleet.TelemetryEvent do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(telemetry_event, attrs) do
     telemetry_event
-    |> cast(attrs, [:latitude, :longitude, :speed, :timestamp, :vehicle_id])
+    |> cast(attrs, [:latitude, :longitude, :speed, :timestamp])
+    |> put_vehicle_id(attrs)
     |> validate_required([:latitude, :longitude, :speed, :timestamp, :vehicle_id])
     |> foreign_key_constraint(:vehicle_id)
+  end
+
+  defp put_vehicle_id(changeset, attrs) do
+    vehicle_id =
+      case attrs do
+        %{} -> Map.get(attrs, :vehicle_id) || Map.get(attrs, "vehicle_id")
+        _ -> nil
+      end
+
+    if is_nil(vehicle_id) do
+      changeset
+    else
+      put_change(changeset, :vehicle_id, vehicle_id)
+    end
   end
 end

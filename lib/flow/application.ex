@@ -10,6 +10,7 @@ defmodule Flow.Application do
     children = [
       FlowWeb.Telemetry,
       Flow.Repo,
+      {Oban, Application.fetch_env!(:flow, Oban)},
       {DNSCluster, query: Application.get_env(:flow, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Flow.PubSub},
       Flow.Telemetry.Pipeline,

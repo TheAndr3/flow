@@ -19,8 +19,23 @@ defmodule Flow.Fleet.Alert do
   @spec changeset(t(), map()) :: Ecto.Changeset.t()
   def changeset(alert, attrs) do
     alert
-    |> cast(attrs, [:type, :description, :resolved, :vehicle_id])
+    |> cast(attrs, [:type, :description, :resolved])
+    |> put_vehicle_id(attrs)
     |> validate_required([:type, :description, :resolved, :vehicle_id])
     |> foreign_key_constraint(:vehicle_id)
+  end
+
+  defp put_vehicle_id(changeset, attrs) do
+    vehicle_id =
+      case attrs do
+        %{} -> Map.get(attrs, :vehicle_id) || Map.get(attrs, "vehicle_id")
+        _ -> nil
+      end
+
+    if is_nil(vehicle_id) do
+      changeset
+    else
+      put_change(changeset, :vehicle_id, vehicle_id)
+    end
   end
 end

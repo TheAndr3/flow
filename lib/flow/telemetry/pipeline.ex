@@ -4,6 +4,7 @@ defmodule Flow.Telemetry.Pipeline do
   alias Broadway.Message
   alias Flow.Fleet.TelemetryEvent
   alias Flow.Repo
+  alias Flow.Workers.AlertGenerator
 
   @batch_size 50
   @batch_timeout 500
@@ -55,9 +56,28 @@ defmodule Flow.Telemetry.Pipeline do
           end)
 
         Repo.insert_all(TelemetryEvent, rows)
+        enqueue_alerts(entries)
     end
 
     messages
+  end
+
+  defp enqueue_alerts(entries) do
+    jobs =
+      entries
+      |> Enum.filter(&(&1.speed > 80.0))
+      |> Enum.map(fn attrs ->
+        AlertGenerator.new(%{
+          "vehicle_id" => attrs.vehicle_id,
+          "speed" => attrs.speed,
+          "timestamp" => DateTime.to_iso8601(attrs.timestamp)
+        })
+      end)
+
+    case jobs do
+      [] -> :ok
+      _ -> Oban.insert_all(jobs)
+    end
   end
 
   defp normalize_event(attrs) when is_map(attrs) do
