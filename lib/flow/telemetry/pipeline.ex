@@ -8,6 +8,7 @@ defmodule Flow.Telemetry.Pipeline do
 
   @batch_size 50
   @batch_timeout 500
+  @telemetry_topic "telemetry_events"
 
   @spec start_link(keyword()) :: GenServer.on_start()
   def start_link(_opts) do
@@ -56,10 +57,17 @@ defmodule Flow.Telemetry.Pipeline do
           end)
 
         Repo.insert_all(TelemetryEvent, rows)
+        broadcast_telemetry(entries)
         enqueue_alerts(entries)
     end
 
     messages
+  end
+
+  defp broadcast_telemetry(entries) do
+    Enum.each(entries, fn attrs ->
+      Phoenix.PubSub.broadcast(Flow.PubSub, @telemetry_topic, {:telemetry_event, attrs})
+    end)
   end
 
   defp enqueue_alerts(entries) do

@@ -124,6 +124,14 @@ defmodule Flow.Fleet do
     Repo.all(TelemetryEvent)
   end
 
+  @spec list_recent_telemetry_events(pos_integer()) :: [TelemetryEvent.t()]
+  def list_recent_telemetry_events(limit \\ 25) do
+    TelemetryEvent
+    |> order_by([t], desc: t.timestamp)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
   @doc """
   Gets a single telemetry_event.
 
@@ -226,6 +234,15 @@ defmodule Flow.Fleet do
   @spec list_alerts() :: [Alert.t()]
   def list_alerts do
     Repo.all(Alert)
+  end
+
+  @spec list_active_alerts(pos_integer()) :: [Alert.t()]
+  def list_active_alerts(limit \\ 20) do
+    Alert
+    |> where([a], a.resolved == false)
+    |> order_by([a], desc: a.inserted_at)
+    |> limit(^limit)
+    |> Repo.all()
   end
 
   @doc """

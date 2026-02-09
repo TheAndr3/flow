@@ -2,6 +2,7 @@ defmodule Flow.Workers.AlertGenerator do
   use Oban.Worker, queue: :high_priority, max_attempts: 5
 
   alias Flow.Fleet
+  @alerts_topic "alerts"
 
   @type args :: %{
           "vehicle_id" => String.t(),
@@ -21,7 +22,9 @@ defmodule Flow.Workers.AlertGenerator do
              description: description,
              resolved: false
            }) do
-        {:ok, _alert} -> :ok
+        {:ok, alert} ->
+          Phoenix.PubSub.broadcast(Flow.PubSub, @alerts_topic, {:alert_created, alert})
+          :ok
         {:error, changeset} -> {:error, changeset}
       end
     else

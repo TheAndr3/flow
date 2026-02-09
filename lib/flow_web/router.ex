@@ -17,7 +17,7 @@ defmodule FlowWeb.Router do
   scope "/", FlowWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live "/", DashboardLive, :index
   end
 
   scope "/api", FlowWeb do
